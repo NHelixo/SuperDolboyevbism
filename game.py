@@ -5,7 +5,7 @@ from kivy.uix.button import Button
 from kivy.uix.textinput import TextInput
 from kivy.uix.popup import Popup
 from kivy.uix.screenmanager import ScreenManager
-
+from kivy.uix.progressbar import ProgressBar
 from screen_base import ScreenBase
 from player import player
 
@@ -92,7 +92,7 @@ class Screen3(ScreenBase):
         self.click.on_press = self.profit1
 
     def profit1(self):
-        player.balance += player.profit
+        player.update_balance(player.profit)
         self.update_text()
 
     def update_text(self):
@@ -146,6 +146,7 @@ class Screen4(ScreenBase):
 
     def achievement1(self):
         self.manager.current = "achievement"
+        app.update_text_on("achievement")
 
     def back1(self):
         self.manager.current = "click"
@@ -159,33 +160,38 @@ class Shop(ScreenBase):
         self.products = [
             {
                 "name": "Бустер1",
-                "price": 100,
+                "price": 1,
                 "description": "Цей бустер збільшить ваш прибуток до 5",
-                "profit": 5
+                "profit": 5,
+                "purchased": False
             },
             {
                 "name": "Бустер2",
                 "price": 1000,
                 "description": "Цей бустер збільшить ваш прибуток до 10",
-                "profit": 10
+                "profit": 10,
+                "purchased": False
             },
             {
                 "name": "Бустер3",
                 "price": 2000,
                 "description": "Цей бустер збільшить ваш прибуток до 20",
-                "profit": 20
+                "profit": 20,
+                "purchased": False
             },
             {
                 "name": "Бустер4",
                 "price": 4000,
                 "description": "Цей бустер збільшить ваш прибуток до 50",
-                "profit": 50
+                "profit": 50,
+                "purchased": False
             },
             {
                 "name": "Бустер5",
                 "price": 8000,
                 "description": "Цей бустер збільшить ваш прибуток до 100",
-                "profit": 100
+                "profit": 100,
+                "purchased": False
             }
         ]
 
@@ -195,7 +201,8 @@ class Shop(ScreenBase):
         ]
 
         buy_buttons = [
-            Button(text = f"Купити {item['name']}")
+            Button(text= f"Купити {item['name']}" if not item['purchased'] else "Куплено")
+
             for item in self.products
         ]
 
@@ -221,13 +228,18 @@ class Shop(ScreenBase):
         self.back.on_press = self.back1
 
         for index, button in enumerate(buy_buttons):
-            button.on_press = lambda x = None, index=index: self.purchase(self.products[index])
+            button.on_press = lambda x = None, index=index: self.purchase(index ,self.products[index])
 
-    def purchase(self, product):
+    def purchase(self, index ,product):
+        if self.products[index]["purchased"]:
+            return
+
         if player.balance <  product["price"]:
             return
-        player.balance -= product["price"]
+
+        self.products[index]["purchased"] = True
         player.profit = product["profit"]
+        player.update_balance(-product["price"])
 
     def back1(self):
         self.manager.current = "menu"
@@ -282,17 +294,28 @@ class Achievement(ScreenBase):
     def __init__(self, name="achievement"):
         super().__init__(name=name)
 
-        text = Label(text = "Скоро буде")
+        self.progress_bar = ProgressBar(max = 1000, value = 0)
+        self.progress_text = Label (text = "Заробіть свою першу тисячу грн.")
+
+
         self.back = Button(text = "Повернутися")
 
-        layout = BoxLayout(orientation = "vertical")
+        layout_progress = BoxLayout()
 
-        layout.add_widget(text)
+        layout_progress.add_widget(self.progress_text)
+        layout_progress.add_widget(self.progress_bar)
+
+        layout = BoxLayout(orientation = "vertical")
+        layout.add_widget(layout_progress)
         layout.add_widget(self.back)
 
         self.add_widget(layout)
 
         self.back.on_press = self.back1
+
+    def update_text(self):
+        self.progress_bar.value = player.total_balance
+
 
     def back1(self):
         self.manager.current = "menu"
