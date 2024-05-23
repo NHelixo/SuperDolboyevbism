@@ -155,27 +155,32 @@ class Shop(Screen):
             {
                 "name": "Бустер1",
                 "price": 100,
-                "description": "Цей бустер збільшить ваш прибуток до 5"
+                "description": "Цей бустер збільшить ваш прибуток до 5",
+                "profit": 5
             },
             {
                 "name": "Бустер2",
                 "price": 1000,
-                "description": "Цей бустер збільшить ваш прибуток до 10"
+                "description": "Цей бустер збільшить ваш прибуток до 10",
+                "profit": 10
             },
             {
                 "name": "Бустер3",
                 "price": 2000,
-                "description": "Цей бустер збільшить ваш прибуток до 20"
+                "description": "Цей бустер збільшить ваш прибуток до 20",
+                "profit": 20
             },
             {
                 "name": "Бустер4",
                 "price": 4000,
-                "description": "Цей бустер збільшить ваш прибуток до 50"
+                "description": "Цей бустер збільшить ваш прибуток до 50",
+                "profit": 50
             },
             {
                 "name": "Бустер5",
                 "price": 8000,
-                "description": "Цей бустер збільшить ваш прибуток до 100"
+                "description": "Цей бустер збільшить ваш прибуток до 100",
+                "profit": 100
             }
         ]
 
@@ -214,9 +219,16 @@ class Shop(Screen):
             button.on_press = lambda x = None, index=index: self.purchase(self.products[index])
 
     def purchase(self, product):
-        print(product)
+        if player.balance <  product["price"]:
+            return
+        player.balance -= product["price"]
+        player.profit = product["profit"]
+
+
+
 
     def back1(self):
+        self.manager.current
         self.manager.current = "menu"
 
 
