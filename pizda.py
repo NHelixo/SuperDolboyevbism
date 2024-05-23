@@ -3,6 +3,7 @@ from kivy.uix.progressbar import ProgressBar
 from kivy.uix.boxlayout import BoxLayout
 from kivy.uix.button import Button
 
+
 class SimpleProgressBarApp(App):
     def build(self):
         self.value1 = 10
@@ -22,10 +23,6 @@ class SimpleProgressBarApp(App):
         else:
             self.value1 = 0
             self.progress_bar.value = self.value1
-
-
-
-
 
 
 if __name__ == '__main__':
