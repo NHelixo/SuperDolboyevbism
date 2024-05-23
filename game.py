@@ -6,6 +6,8 @@ from kivy.uix.textinput import TextInput
 from kivy.uix.popup import Popup
 from kivy.uix.screenmanager import ScreenManager, Screen
 
+from player import player
+
 
 
 class Screen1(Screen):
@@ -23,6 +25,7 @@ class Screen1(Screen):
         self.add_widget(layout)
 
         self.btn.on_press = self.next
+
     def next(self):
         self.manager.current = "pers"
 
@@ -59,17 +62,16 @@ class Screen2(Screen):
         self.add_widget(layout1)
 
         self.cont.on_press = self.next
+
     def next(self):
         self.manager.current = "click"
+
 
 class Screen3(Screen):
     def __init__(self, name="click"):
         super().__init__(name=name)
 
-        self.balance = 0
-        self.profit = 1
-
-        self.money = Label(text=f"Ваш баланс: {self.balance}\nВаш прибуток: {self.profit}")
+        self.money = Label(text=f"Ваш баланс: {player.balance}\nВаш прибуток: {player.profit}")
 
 
 
@@ -89,11 +91,12 @@ class Screen3(Screen):
         self.click.on_press = self.profit1
 
     def profit1(self):
-        self.balance += self.profit
-        self.money.text = f"Ваш баланс: {self.balance}\nВаш прибуток: {self.profit}"
+        player.balance += player.profit
+        self.money.text = f"Ваш баланс: {player.balance}\nВаш прибуток: {player.profit}"
 
     def next(self):
         self.manager.current = "menu"
+
 
 class Screen4(Screen):
     def __init__(self, name="menu"):
@@ -148,84 +151,74 @@ class Shop(Screen):
     def __init__(self, name="shop"):
         super().__init__(name=name)
 
-        self.products = [{"name": "Бустер1",
-                    "price": 100,
-                    "description": "Цей бустер збільшить ваш прибуток до 5"},
+        self.products = [
+            {
+                "name": "Бустер1",
+                "price": 100,
+                "description": "Цей бустер збільшить ваш прибуток до 5"
+            },
+            {
+                "name": "Бустер2",
+                "price": 1000,
+                "description": "Цей бустер збільшить ваш прибуток до 10"
+            },
+            {
+                "name": "Бустер3",
+                "price": 2000,
+                "description": "Цей бустер збільшить ваш прибуток до 20"
+            },
+            {
+                "name": "Бустер4",
+                "price": 4000,
+                "description": "Цей бустер збільшить ваш прибуток до 50"
+            },
+            {
+                "name": "Бустер5",
+                "price": 8000,
+                "description": "Цей бустер збільшить ваш прибуток до 100"
+            }
+        ]
 
-                    {"name": "Бустер2",
-                     "price": 1000,
-                     "description": "Цей бустер збільшить ваш прибуток до 10"},
+        product_labels = [
+            Label(text = f"Назва: {item['name']}\nЦіна: {item['price']}\nОпис: {item['description']}")
+            for item in self.products
+        ]
 
-                    {"name": "Бустер3",
-                     "price": 2000,
-                     "description": "Цей бустер збільшить ваш прибуток до 20"},
+        buy_buttons = [
+            Button(text = f"Купити {item['name']}")
+            for item in self.products
+        ]
 
-                    {"name": "Бустер4",
-                     "price": 4000,
-                     "description": "Цей бустер збільшить ваш прибуток до 50"}
-                    ]
+        layouts = [
+            BoxLayout()
+            for i in range(len(self.products))
+        ]
 
-        product1 = Label(text = f"Назва: {self.products[0]['name']}\nЦіна: {self.products[0]['price']}\nОпис: {self.products[0]['description']}")
-        product2 = Label(text= f"Назва: {self.products[1]['name']}\nЦіна: {self.products[1]['price']}\nОпис: {self.products[1]['description']}")
-        product3 = Label(text= f"Назва: {self.products[2]['name']}\nЦіна: {self.products[2]['price']}\nОпис: {self.products[2]['description']}")
-        product4 = Label(text= f"Назва: {self.products[3]['name']}\nЦіна: {self.products[3]['price']}\nОпис: {self.products[3]['description']}")
-
-        self.buy_product1 = Button(text = "Купити Бустер1")
-        self.buy_product2 = Button(text="Купити Бустер2")
-        self.buy_product3 = Button(text="Купити Бустер3")
-        self.buy_product4 = Button(text="Купити Бустер4")
-
-        layout_product1 = BoxLayout()
-        layout_product2 = BoxLayout()
-        layout_product3 = BoxLayout()
-        layout_product4 = BoxLayout()
-
-        layout_product1.add_widget(product1)
-        layout_product1.add_widget(self.buy_product1)
-
-        layout_product2.add_widget(product2)
-        layout_product2.add_widget(self.buy_product2)
-
-        layout_product3.add_widget(product3)
-        layout_product3.add_widget(self.buy_product3)
-
-        layout_product4.add_widget(product4)
-        layout_product4.add_widget(self.buy_product4)
+        for index, layout in enumerate(layouts):
+            layout.add_widget(product_labels[index])
+            layout.add_widget(buy_buttons[index])
 
         self.back = Button(text = "Повернутися")
 
         layout = BoxLayout(orientation = "vertical")
 
-        layout.add_widget(layout_product1)
-        layout.add_widget(layout_product2)
-        layout.add_widget(layout_product3)
-        layout.add_widget(layout_product4)
+        for l in layouts:
+            layout.add_widget(l)
 
         layout.add_widget(self.back)
-
         self.add_widget(layout)
 
         self.back.on_press = self.back1
 
-        self.buy_product1.on_press = self.Buy1
-        self.buy_product2.on_press = self.Buy2
-        self.buy_product3.on_press = self.Buy3
-        self.buy_product4.on_press = self.Buy4
+        for index, button in enumerate(buy_buttons):
+            button.on_press = lambda x = None, index=index: self.purchase(self.products[index])
 
-    def Buy1(self):
-        pass
-
-    def Buy2(self):
-        pass
-
-    def Buy3(self):
-        pass
-
-    def Buy4(self):
-        pass
+    def purchase(self, product):
+        print(product)
 
     def back1(self):
         self.manager.current = "menu"
+
 
 class Shares(Screen):
     def __init__(self, name="shares"):
