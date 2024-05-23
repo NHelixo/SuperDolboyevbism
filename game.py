@@ -4,13 +4,14 @@ from kivy.uix.label import Label
 from kivy.uix.button import Button
 from kivy.uix.textinput import TextInput
 from kivy.uix.popup import Popup
-from kivy.uix.screenmanager import ScreenManager, Screen
+from kivy.uix.screenmanager import ScreenManager
 
+from screen_base import ScreenBase
 from player import player
 
 
 
-class Screen1(Screen):
+class Screen1(ScreenBase):
     def __init__(self, name="welcome"):
         super().__init__(name=name)
 
@@ -31,7 +32,7 @@ class Screen1(Screen):
 
 
 
-class Screen2(Screen):
+class Screen2(ScreenBase):
     def __init__(self, name="pers"):
         super().__init__(name=name)
 
@@ -67,7 +68,7 @@ class Screen2(Screen):
         self.manager.current = "click"
 
 
-class Screen3(Screen):
+class Screen3(ScreenBase):
     def __init__(self, name="click"):
         super().__init__(name=name)
 
@@ -92,13 +93,16 @@ class Screen3(Screen):
 
     def profit1(self):
         player.balance += player.profit
+        self.update_text()
+
+    def update_text(self):
         self.money.text = f"Ваш баланс: {player.balance}\nВаш прибуток: {player.profit}"
 
     def next(self):
         self.manager.current = "menu"
 
 
-class Screen4(Screen):
+class Screen4(ScreenBase):
     def __init__(self, name="menu"):
         super().__init__(name=name)
 
@@ -145,9 +149,10 @@ class Screen4(Screen):
 
     def back1(self):
         self.manager.current = "click"
+        app.update_text_on("click")
 
 
-class Shop(Screen):
+class Shop(ScreenBase):
     def __init__(self, name="shop"):
         super().__init__(name=name)
 
@@ -224,15 +229,12 @@ class Shop(Screen):
         player.balance -= product["price"]
         player.profit = product["profit"]
 
-
-
-
     def back1(self):
-        self.manager.current
         self.manager.current = "menu"
+        app.update_text_on("menu")
 
 
-class Shares(Screen):
+class Shares(ScreenBase):
     def __init__(self, name="shares"):
         super().__init__(name=name)
 
@@ -254,7 +256,8 @@ class Shares(Screen):
     def back1(self):
         self.manager.current = "menu"
 
-class Business(Screen):
+
+class Business(ScreenBase):
     def __init__(self, name="business"):
         super().__init__(name=name)
 
@@ -275,7 +278,7 @@ class Business(Screen):
     def back1(self):
         self.manager.current = "menu"
 
-class Achievement(Screen):
+class Achievement(ScreenBase):
     def __init__(self, name="achievement"):
         super().__init__(name=name)
 
@@ -293,19 +296,27 @@ class Achievement(Screen):
 
     def back1(self):
         self.manager.current = "menu"
+
+
 class Game(App):
     def build(self):
-        sm = ScreenManager()
-        sm.add_widget(Screen1())
-        sm.add_widget(Screen2())
-        sm.add_widget(Screen3())
-        sm.add_widget(Screen4())
-        sm.add_widget(Shop())
-        sm.add_widget(Shares())
-        sm.add_widget(Business())
-        sm.add_widget(Achievement())
+        self.sm = ScreenManager()
+        self.sm.add_widget(Screen1())
+        self.sm.add_widget(Screen2())
+        self.sm.add_widget(Screen3())
+        self.sm.add_widget(Screen4())
+        self.sm.add_widget(Shop())
+        self.sm.add_widget(Shares())
+        self.sm.add_widget(Business())
+        self.sm.add_widget(Achievement())
 
-        return sm
+        return self.sm
 
-app=Game()
+    def update_text_on(self, screen_name):
+        screen = self.sm.get_screen(screen_name)
+        screen.update_text()
+
+
+app = Game()
+
 app.run()
