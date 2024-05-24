@@ -1,3 +1,5 @@
+import json
+
 from kivy.app import App
 from kivy.uix.boxlayout import BoxLayout
 from kivy.uix.label import Label
@@ -41,9 +43,8 @@ class Screen2(ScreenBase):
 
         self.cont = Button(text="Продовжити")
 
-        name = TextInput(multiline=False)
-        age = TextInput(multiline=False)
-
+        self.player_name = TextInput(multiline=False)
+        self.player_age = TextInput(multiline=False)
 
         layout1 = BoxLayout(orientation ="vertical")
 
@@ -51,10 +52,10 @@ class Screen2(ScreenBase):
         age_layout = BoxLayout()
 
         name_layout.add_widget(self.name_text)
-        name_layout.add_widget(name)
+        name_layout.add_widget(self.player_name)
 
         age_layout.add_widget(self.age_text)
-        age_layout.add_widget(age)
+        age_layout.add_widget(self.player_age)
 
         layout1.add_widget(name_layout)
         layout1.add_widget(age_layout)
@@ -65,7 +66,11 @@ class Screen2(ScreenBase):
         self.cont.on_press = self.next
 
     def next(self):
+        player.name = self.player_name.text
+        player.age = self.player_age.text
+        app.load_player_progress(player.name)
         self.manager.current = "click"
+        app.update_text_on("click")
 
 
 class Screen3(ScreenBase):
@@ -73,8 +78,6 @@ class Screen3(ScreenBase):
         super().__init__(name=name)
 
         self.money = Label(text=f"Ваш баланс: {player.balance}\nВаш прибуток: {player.profit}")
-
-
 
         self.click = Button(text="Клікай")
         self.menu = Button(text = "Меню")
@@ -157,43 +160,9 @@ class Shop(ScreenBase):
     def __init__(self, name="shop"):
         super().__init__(name=name)
 
-        self.products = [
-            {
-                "name": "Бустер1",
-                "price": 1,
-                "description": "Цей бустер збільшить ваш прибуток до 5",
-                "profit": 5,
-                "purchased": False
-            },
-            {
-                "name": "Бустер2",
-                "price": 1000,
-                "description": "Цей бустер збільшить ваш прибуток до 10",
-                "profit": 10,
-                "purchased": False
-            },
-            {
-                "name": "Бустер3",
-                "price": 2000,
-                "description": "Цей бустер збільшить ваш прибуток до 20",
-                "profit": 20,
-                "purchased": False
-            },
-            {
-                "name": "Бустер4",
-                "price": 4000,
-                "description": "Цей бустер збільшить ваш прибуток до 50",
-                "profit": 50,
-                "purchased": False
-            },
-            {
-                "name": "Бустер5",
-                "price": 8000,
-                "description": "Цей бустер збільшить ваш прибуток до 100",
-                "profit": 100,
-                "purchased": False
-            }
-        ]
+        with open('data/data.json', 'rb') as file:
+            data = json.load(file)
+            self.products = data["products"]
 
         product_labels = [
             Label(text = f"Назва: {item['name']}\nЦіна: {item['price']}\nОпис: {item['description']}")
@@ -338,6 +307,34 @@ class Game(App):
     def update_text_on(self, screen_name):
         screen = self.sm.get_screen(screen_name)
         screen.update_text()
+    
+    def save_player_progress(self):
+        data = {}
+        with open('data/data.json', 'rb') as file:
+            data = json.load(file)
+
+            for index, saved_player in enumerate(data['players']):
+                if saved_player['name'] == player.name:
+                    data["players"][index] = player.to_json()
+                    break
+            else:
+                data['players'].append(player.to_json())
+        
+        with open('data/data.json', 'w', encoding='utf-8') as file:
+            json.dump(data, file, indent=4)
+
+    def load_player_progress(self, username):
+        with open('data/data.json', 'rb') as file:
+            data = json.load(file)
+            for index, saved_player in enumerate(data['players']):
+                if username == saved_player['name']:
+                    player.load_data(data["players"][index])
+
+    def on_start(self):
+        self.load_player_progress("admin")
+
+    def on_stop(self):
+       self.save_player_progress()
 
 
 app = Game()

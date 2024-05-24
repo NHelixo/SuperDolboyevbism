@@ -9,7 +9,7 @@ class MyApp1(App):
     def build(self):
         layout = RelativeLayout()
 
-        button = Button(text = "fff", background_normal='E:/python/cliker game/pictures/button.png', background_down= 'E:/python/cliker game/pictures/button_down.png')
+        button = Button(text = "fff", background_normal='pictures/button.png', background_down= 'pictures/button_down.png')
 
         layout.add_widget(button)
 
