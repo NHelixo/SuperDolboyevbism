@@ -150,8 +150,10 @@ class Screen4(ScreenBase):
 
     def shares1(self):
         self.manager.current = "shares"
-        for share in player.shares:
-            share.update_price()
+        if player.shares:
+            new_price = player.shares[0].get_new_price()
+            for share in player.shares:
+                share.price = new_price
         app.update_text_on("shares")
 
 
@@ -240,7 +242,7 @@ class Shares(ScreenBase):
 
         self.shares_amount = Label(text = f"Кількість акцій: {len(player.shares)}")
         self.total_price_text = Label(text = f"Ціна ваших акцій: {total_price}")
-        self.price_shares_text = Label(text = f"Ціна одної акції: {Share.price}")
+        self.price_shares_text = Label(text = f"Ціна одної акції: {Share.initial_price}")
 
         layout_price = BoxLayout()
 
@@ -255,6 +257,8 @@ class Shares(ScreenBase):
         layout.add_widget(sell_shares)
         layout.add_widget(self.back)
 
+        buy_shares.on_press = self.buy_shares
+
         self.add_widget(layout)
 
         self.back.on_press = self.back1
@@ -264,18 +268,18 @@ class Shares(ScreenBase):
 
     def buy_shares(self):
         player.shares.append(Share())
+        print(player.shares)
+        self.update_text()
 
     def update_text(self):
         share_prices = [share.price for share in player.shares]
         total_price = sum(share_prices)
 
+        print(share_prices, total_price)
+
         self.shares_amount.text = f"Кількість акцій: {len(player.shares)}"
-        self.total_price_text = f"Ціна ваших акцій: {total_price}"
-        self.price_shares_text = f"Ціна одної акції: {Share.price}"
-
-
-
-
+        self.total_price_text.text = f"Ціна ваших акцій: {total_price}"
+        self.price_shares_text.text = f"Ціна одної акції: {Share.initial_price}"
 
 
 
