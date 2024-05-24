@@ -10,6 +10,7 @@ from kivy.uix.screenmanager import ScreenManager
 from kivy.uix.progressbar import ProgressBar
 from screen_base import ScreenBase
 from player import player
+from shares import Share
 
 
 
@@ -114,6 +115,7 @@ class Screen4(ScreenBase):
         self.shares = Button(text = "Акції")
         self.achievement = Button(text = "Досягнення")
         self.back = Button(text = "Перейти назад")
+        self.save = Button(text = "Зберегти гру")
 
         layout = BoxLayout(orientation = "vertical")
         layout1 = BoxLayout()
@@ -129,6 +131,7 @@ class Screen4(ScreenBase):
         layout.add_widget(layout2)
 
         layout.add_widget(self.back)
+        layout.add_widget(self.save)
 
         self.add_widget(layout)
 
@@ -137,12 +140,20 @@ class Screen4(ScreenBase):
         self.shares.on_press = self.shares1
         self.business.on_press = self.business1
         self.achievement.on_press = self.achievement1
+        self.save.on_press = self.save1
+
+    def save1(self):
+        app.save_player_progress()
 
     def shop1(self):
         self.manager.current = "shop"
 
     def shares1(self):
         self.manager.current = "shares"
+        for share in player.shares:
+            share.update_price()
+        app.update_text_on("shares")
+
 
     def business1(self):
         self.manager.current = "business"
@@ -224,8 +235,22 @@ class Shares(ScreenBase):
 
         self.back = Button(text = "Повернутися")
 
+        share_prices = [share.price for share in player.shares]
+        total_price = sum(share_prices)
+
+        self.shares_amount = Label(text = f"Кількість акцій: {len(player.shares)}")
+        self.total_price_text = Label(text = f"Ціна ваших акцій: {total_price}")
+        self.price_shares_text = Label(text = f"Ціна одної акції: {Share.price}")
+
+        layout_price = BoxLayout()
+
+        layout_price.add_widget(self.price_shares_text)
+        layout_price.add_widget(self.shares_amount)
+        layout_price.add_widget(self.total_price_text)
+
         layout = BoxLayout(orientation = "vertical")
 
+        layout.add_widget(layout_price)
         layout.add_widget(buy_shares)
         layout.add_widget(sell_shares)
         layout.add_widget(self.back)
@@ -236,6 +261,22 @@ class Shares(ScreenBase):
 
     def back1(self):
         self.manager.current = "menu"
+
+    def buy_shares(self):
+        player.shares.append(Share())
+
+    def update_text(self):
+        share_prices = [share.price for share in player.shares]
+        total_price = sum(share_prices)
+
+        self.shares_amount.text = f"Кількість акцій: {len(player.shares)}"
+        self.total_price_text = f"Ціна ваших акцій: {total_price}"
+        self.price_shares_text = f"Ціна одної акції: {Share.price}"
+
+
+
+
+
 
 
 class Business(ScreenBase):

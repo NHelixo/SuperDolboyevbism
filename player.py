@@ -3,6 +3,8 @@ class Player:
         self.name = ""
         self.age = ""
 
+        self.shares = []
+
         self.balance = 0
         self.profit = 1
 
