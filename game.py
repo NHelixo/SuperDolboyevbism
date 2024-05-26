@@ -239,25 +239,35 @@ class Shares(ScreenBase):
 
         share_prices = [share.price for share in player.shares]
         total_price = sum(share_prices)
+        price_one_shares_text = ""
+        if player.shares:
+            price_one_shares_text = player.shares[0].price
 
         self.shares_amount = Label(text = f"Кількість акцій: {len(player.shares)}")
         self.total_price_text = Label(text = f"Ціна ваших акцій: {total_price}")
         self.price_shares_text = Label(text = f"Ціна одної акції: {Share.initial_price}")
+        self.price_one_shares = Label(text = f"Ціна одної купленої акції: {price_one_shares_text}")
 
         layout_price = BoxLayout()
+        layout_price1 = BoxLayout()
 
-        layout_price.add_widget(self.price_shares_text)
-        layout_price.add_widget(self.shares_amount)
+
+        layout_price1.add_widget(self.price_shares_text)
+        layout_price1.add_widget(self.shares_amount)
+
         layout_price.add_widget(self.total_price_text)
+        layout_price.add_widget(self.price_one_shares)
 
         layout = BoxLayout(orientation = "vertical")
 
         layout.add_widget(layout_price)
+        layout.add_widget(layout_price1)
         layout.add_widget(buy_shares)
         layout.add_widget(sell_shares)
         layout.add_widget(self.back)
 
         buy_shares.on_press = self.buy_shares
+        sell_shares.on_press = self.sell_shares1
 
         self.add_widget(layout)
 
@@ -267,19 +277,29 @@ class Shares(ScreenBase):
         self.manager.current = "menu"
 
     def buy_shares(self):
+        player.update_balance(-Share.initial_price)
         player.shares.append(Share())
-        print(player.shares)
         self.update_text()
+
+    def sell_shares1(self):
+        share_prices = [share.price for share in player.shares]
+        total_price = sum(share_prices)
+        player.update_balance(total_price)
+        player.shares = []
 
     def update_text(self):
         share_prices = [share.price for share in player.shares]
         total_price = sum(share_prices)
 
-        print(share_prices, total_price)
-
         self.shares_amount.text = f"Кількість акцій: {len(player.shares)}"
         self.total_price_text.text = f"Ціна ваших акцій: {total_price}"
         self.price_shares_text.text = f"Ціна одної акції: {Share.initial_price}"
+
+        price_one_shares_text = ""
+        if player.shares:
+            price_one_shares_text = player.shares[0].price
+
+        self.price_one_shares.text = f"Ціна одної купленої акції: {price_one_shares_text}"
 
 
 

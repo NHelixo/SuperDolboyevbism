@@ -40,7 +40,7 @@
         {
             "name": "admin",
             "age": "",
-            "balance": 289,
+            "balance": 1000000,
             "profit": 5,
             "total_balance": 291
         },
@@ -54,9 +54,9 @@
         {
             "name": "",
             "age": "",
-            "balance": 10000000054,
+            "balance": 934,
             "profit": 5,
-            "total_balance": 336
+            "total_balance": 2240
         }
     ]
 }
